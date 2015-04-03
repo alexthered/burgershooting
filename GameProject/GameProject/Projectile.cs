@@ -89,9 +89,15 @@ namespace GameProject
         public void Update(GameTime gameTime)
         {
             // move projectile
-            drawRectangle.Y -= (int)(yVelocity * gameTime.ElapsedGameTime.Milliseconds);
+            // because french fries go up and teddy bear projectiles will go down.
+            if (type == GameProject.ProjectileType.FrenchFries)
+                drawRectangle.Y -= (int)(yVelocity * gameTime.ElapsedGameTime.Milliseconds);
+            else
+                drawRectangle.Y += (int)(yVelocity * gameTime.ElapsedGameTime.Milliseconds);
 
             // check for outside game window
+            if (drawRectangle.Top < 0 || drawRectangle.Bottom >= GameConstants.WINDOW_HEIGHT)
+                active = false;
 
         }
 

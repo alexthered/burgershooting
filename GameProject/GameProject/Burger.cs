@@ -140,9 +140,25 @@ namespace GameProject
                 if (drawRectangle.Bottom > GameConstants.WINDOW_HEIGHT)
                     drawRectangle.Y = GameConstants.WINDOW_HEIGHT - drawRectangle.Height;
 
-                //create a new projectile if left mouse button is pressed
-                if (mouse.LeftButton == ButtonState.Pressed)
+                //control the firing rate by setting the time interval for activating canShoot
+                if (!canShoot)
                 {
+                    elapsedCooldownTime += gameTime.ElapsedGameTime.Milliseconds;
+                    if (elapsedCooldownTime > GameConstants.BURGER_COOLDOWN_MILLISECONDS || mouse.LeftButton == ButtonState.Released)
+                    {
+                        //re-activae the firing
+                        canShoot = true;
+                        elapsedCooldownTime = 0;
+                    }
+                    
+                }
+
+
+                //create a new projectile if left mouse button is pressed
+                if (mouse.LeftButton == ButtonState.Pressed && canShoot)
+                {
+                    canShoot = false;
+
                     Projectile new_projectile = new Projectile(GameProject.ProjectileType.FrenchFries,
                                                             Game1.GetProjectileSprite(GameProject.ProjectileType.FrenchFries),
                                                             drawRectangle.X + drawRectangle.Width/2,
