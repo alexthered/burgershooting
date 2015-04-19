@@ -96,8 +96,11 @@ namespace GameProject
             // add initial game objects
             burger = new Burger(Content, "burger", GameConstants.WINDOW_WIDTH/2, 7*GameConstants.WINDOW_HEIGHT/8, null);
 
-            //add a new single TeddyBear
-            SpawnBear();
+            //add multiple bears
+            for (int i = 0; i < GameConstants.MAX_BEARS; i++)
+            {
+                SpawnBear();
+            }
 
             // set initial health and score strings
         }
@@ -142,6 +145,45 @@ namespace GameProject
             }
 
             // check and resolve collisions between teddy bears
+            for (int i = 0; i < bears.Count; i++)
+            {
+                for (int j = i + 1; j < bears.Count; j++)
+                {
+                    //make sure two bears are both active
+                    if (bears[i].Active && bears[j].Active)
+                    {
+                        CollisionResolutionInfo collision_info = CollisionUtils.CheckCollision(gameTime.ElapsedGameTime.Milliseconds,
+                                                                                                GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT,
+                                                                                                bears[i].Velocity, bears[i].DrawRectangle,
+                                                                                                bears[j].Velocity, bears[j].DrawRectangle);
+
+                        //if two objects collide
+                        if (collision_info!=null)
+                        {
+                            if (collision_info.FirstOutOfBounds)
+                            {
+                                bears[i].Active = false; //object is out of bound, make it inactive
+                            }
+                            else
+                            {
+                                bears[i].Velocity = collision_info.FirstVelocity;
+                                bears[i].DrawRectangle = collision_info.FirstDrawRectangle;
+                            }
+
+                            if (collision_info.SecondOutOfBounds)
+                            {
+                                bears[j].Active = false; //object is out of bound, make it inactive
+                            }
+                            else
+                            {
+                                bears[j].Velocity = collision_info.SecondVelocity;
+                                bears[j].DrawRectangle = collision_info.SecondDrawRectangle;
+                            }
+                        }
+                                                                                
+                    }
+                }
+            }
 
             // check and resolve collisions between burger and teddy bears
 
@@ -187,6 +229,13 @@ namespace GameProject
             }
 
             // clean out finished explosions
+            for (int i = explosions.Count - 1; i >= 0; i--)
+            {
+                if (explosions[i].Finished)
+                {
+                    explosions.RemoveAt(i);
+                }
+            }
 
             base.Update(gameTime);
         }
