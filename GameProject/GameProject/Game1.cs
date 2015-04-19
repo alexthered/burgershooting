@@ -91,6 +91,7 @@ namespace GameProject
             // load projectile and explosion sprites
             teddyBearProjectileSprite = Content.Load<Texture2D>("teddybearprojectile");
             frenchFriesSprite = Content.Load<Texture2D>("frenchfries");
+            explosionSpriteStrip = Content.Load<Texture2D>("explosion");
 
             // add initial game objects
             burger = new Burger(Content, "burger", GameConstants.WINDOW_WIDTH/2, 7*GameConstants.WINDOW_HEIGHT/8, null);
@@ -147,10 +148,43 @@ namespace GameProject
             // check and resolve collisions between burger and projectiles
 
             // check and resolve collisions between teddy bears and projectiles
+            foreach (TeddyBear bear in bears)
+            {
+                foreach (Projectile projectile in projectiles)
+                {
+                    if (projectile.Type == GameProject.ProjectileType.FrenchFries &&
+                        projectile.Active && bear.Active && //both object must be active
+                        projectile.CollisionRectangle.Intersects(bear.CollisionRectangle))  //two objects colide
+                    {
+                        //set the status of them to inactive
+                        bear.Active = false;
+                        projectile.Active = false;
+
+                        //create an explosion here
+                        Explosion explosion = new Explosion(explosionSpriteStrip, bear.Location.X, bear.Location.Y);
+
+                        explosions.Add(explosion);
+                    }
+                }
+            }
 
             // clean out inactive teddy bears and add new ones as necessary
+            for (int i = bears.Count - 1; i >= 0; i--)
+            {
+                if (!bears[i].Active)
+                {
+                    bears.RemoveAt(i);
+                }
+            }
 
             // clean out inactive projectiles
+            for (int i = projectiles.Count - 1; i >= 0; i--)
+            {
+                if (!projectiles[i].Active)
+                {
+                    projectiles.RemoveAt(i);
+                }
+            }
 
             // clean out finished explosions
 
